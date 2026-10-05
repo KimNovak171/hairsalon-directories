@@ -2,6 +2,7 @@ import type { Facility } from "@/components/FacilityCard";
 import fs from "fs";
 import path from "path";
 import { getCanadaStatsForGlobal } from "@/lib/canadaFacilities";
+import { applyListingCorrection } from "@/lib/listingCorrections";
 
 export type RawFacility = {
   id: string;
@@ -61,7 +62,8 @@ function transformAlternateFormatFacilities(
   stateSlug: string,
 ): RawFacility[] {
   const valid = facilities.filter((f) => ((f.city ?? "").trim() !== ""));
-  return valid.map((f, index) => {
+  return valid.map((rawFacility, index) => {
+    const f = applyListingCorrection(rawFacility);
     const citySlug = slugify(f.city);
     const nameSlug = slugify(f.name);
     const id = `${nameSlug}-${citySlug}-${index}`;
